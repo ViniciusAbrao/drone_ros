@@ -1,6 +1,6 @@
 This is an example of code for takeoff, move and land the drone with PX4 and MAVROS.
 
-- Simulation setup:
+Simulation setup:
 
 1- ROS Noetic:
 http://wiki.ros.org/noetic/Installation/Ubuntu
@@ -20,7 +20,7 @@ http://wiki.ros.org/noetic/Installation/Ubuntu
 - https://docs.qgroundcontrol.com/master/en/getting_started/download_and_install.html
 
 
-- Launch the GAZEBO simulation:
+5- Launch the GAZEBO simulation:
 
 - cd ~/PX4-Autopilot
 - source /opt/ros/noetic/setup.bash
@@ -31,15 +31,15 @@ http://wiki.ros.org/noetic/Installation/Ubuntu
 - roslaunch px4 mavros_posix_sitl.launch 
 
 
-- Open QGroundControl to monitore the drone
+6- Open QGroundControl to monitore the drone
 
 
-- Run the example code:
+7- Run the example code:
 
-python3 flight_example.py
+- python3 flight_example.py
 
 
-- Code also tested with drone model S500 (Holybro), Pixhawk 4 and RaspberryPi on board:
+8- Code also tested with drone model S500 (Holybro), Pixhawk 4 and RaspberryPi on board:
 
 - ssh -C -Y robot@10.1.100.2 (user@raspberrypi_IP)
 - sudo chmod a+rw /dev/ttyACM0 (USB connection between Pixhawk and RaspberryPi)
