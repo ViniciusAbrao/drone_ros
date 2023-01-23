@@ -1,92 +1,52 @@
 #!/usr/bin/env python3
-
-# ROS python API
 import rospy
-
-# import all mavros messages and services
-from mavros_msgs.msg import *
-from mavros_msgs.srv import *
-
-
-class Modes:
+from my_package.msg import Corner   #publish motion increment 
+from std_msgs.msg import Int32      #subscribe drone corner
+    
+class cornerMoniter:
     def __init__(self):
-        pass
-
-    def setArm(self):
-        rospy.wait_for_service('mavros/cmd/arming')
-        try:
-            armService = rospy.ServiceProxy('mavros/cmd/arming', mavros_msgs.srv.CommandBool)
-            armService(True)
-        except (rospy.ServiceException, e):
-            print ("Service arming call failed: %s",e)
-
-    def auto_set_mode(self):
-        rospy.wait_for_service('mavros/set_mode')
-        try:
-            # setModeService = rospy.ServiceProxy('mavros/set_mode', mavros_msgs.srv.set_mode.request.custom_mode)
-            setModeService = rospy.ServiceProxy('mavros/set_mode', mavros_msgs.srv.SetMode)
-            setModeService(custom_mode="AUTO.MISSION")
-        except (rospy.ServiceException, e):
-            print ("Service takeoff call failed: %s",e)
-
-    def wpPull(self,wps):
-        rospy.wait_for_service('mavros/mission/pull')
-        try:
-            wpSetCurrent = rospy.ServiceProxy('mavros/mission/set_current', WaypointSetCurrent)
-            wpSetCurrent.call(wps)
-            wpPullService = rospy.ServiceProxy('mavros/mission/pull', WaypointPull,persistent=True)
-            print (wpPullService().wp_received)
-
-            print ("Waypoint Pulled")
-        except (rospy.ServiceException, e):
-            print ("Service Puling call failed: %s",e)
-
-class stateMoniter:
-    def __init__(self):
-        self.state = State()
-        self.cur_wp = WaypointReached()
+        self.corner = Int32()
         
     def stateCb(self, msg):
-        self.state = msg
-        
-    def wpCb(self, msg):
-        self.cur_wp = msg
+        self.corner = msg
 
+if __name__ == "__main__":
 
-def main():
-    rospy.init_node('controller_node')
+    rospy.init_node("controller_node")
+    
     rate = rospy.Rate(20.0)
 
-    stateMt = stateMoniter()
-    md = Modes()
-
-    md.wpPull(0)
-    rospy.Subscriber("/mavros/state",State, stateMt.stateCb)
+    cornerMt = cornerMoniter()
     
-    rospy.Subscriber("/mavros/mission/reached",WaypointReached, stateMt.wpCb)
+    # Subscribe to drone's corner
+    state_sub = rospy.Subscriber("/square_corner", Int32, callback = cornerMt.stateCb)
 
-    # Arming the drone
-    while not stateMt.state.armed:
-        md.setArm()
+    # Publish incremental motion to complete a square path
+    motion_pub = rospy.Publisher('/square_motion', Corner, queue_size=10)
+    motion_msg = Corner()
+  
+
+    # Wait for Flight Controller connection
+    while(not rospy.is_shutdown()):
+        if (cornerMt.corner.data==1):
+            motion_msg.corner_x=4
+            motion_msg.corner_y=0
+            motion_msg.corner_z=0
+            motion_pub.publish(motion_msg)
+        elif (cornerMt.corner.data==2):
+            motion_msg.corner_x=0
+            motion_msg.corner_y=-4
+            motion_msg.corner_z=0
+            motion_pub.publish(motion_msg)
+        elif (cornerMt.corner.data==3):
+            motion_msg.corner_x=-4
+            motion_msg.corner_y=0
+            motion_msg.corner_z=0
+            motion_pub.publish(motion_msg)
+        elif (cornerMt.corner.data==4):
+            motion_msg.corner_x=0
+            motion_msg.corner_y=4
+            motion_msg.corner_z=0
+            motion_pub.publish(motion_msg)
         rate.sleep()
-    # Switching the state to auto mode
-    while not stateMt.state.mode=="AUTO.MISSION":
-        md.auto_set_mode()
-        rate.sleep()
-        print ("AUTO.MISSION")
-        
-    while not rospy.is_shutdown():
-        print (stateMt.cur_wp.wp_seq)
-        if stateMt.cur_wp.wp_seq==2:
-            print (stateMt.cur_wp.wp_seq)
-            rate.sleep()
-        rate.sleep()
-
-    # rospy.spin()
-
-
-if __name__ == '__main__':
-    try:
-        main()
-    except rospy.ROSInterruptException:
-        pass
+     

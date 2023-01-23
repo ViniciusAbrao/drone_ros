@@ -1,8 +1,9 @@
 <launch>
       
-    <node pkg="my_package" type="my_controller.py" name="controller_node"  output="screen">
+    <node pkg="my_package" type="my_commander.py" name="commander_node"  output="screen">
     </node> 
     
-
+    <node pkg="my_package" type="my_controller.py" name="coontroller_node"  output="screen">
+    </node>
     
 </launch>

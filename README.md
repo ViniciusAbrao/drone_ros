@@ -45,7 +45,7 @@ http://wiki.ros.org/noetic/Installation/Ubuntu
 - sudo chmod a+rw /dev/ttyACM0 (USB connection between Pixhawk and RaspberryPi)
 - roslaunch mavros px4.launch fcu_url:=/dev/ttyACM0 gcs_url:=udp://@10.1.100.3 (laptop's IP with QGroundControl)
 
-## Controller/Command nodes
+## Controller/Commander nodes
 
 roslaunch my_package my_launch.launch
 
