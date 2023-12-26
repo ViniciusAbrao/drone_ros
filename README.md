@@ -53,6 +53,12 @@ $ sudo chmod a+rw /dev/ttyACM0 (USB connection between Pixhawk and RaspberryPi)
 $ roslaunch mavros px4.launch fcu_url:=/dev/ttyACM0 gcs_url:=udp://@10.1.100.3 (laptop's IP with QGroundControl)
 ```
 
+or, based on mavproxy:
+
+```
+$ sudo mavproxy.py --master=/dev/serial0 --out=udp:192.168.43.109:14550 --baudrate 57600 (RX/TX connection and laptop's IP with QGroundControl)
+```
+
 ## Controller/Commander nodes
 
 ```
